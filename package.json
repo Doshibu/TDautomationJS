@@ -51,6 +51,6 @@
     "pretest": "npm run quality",
     "test": "mocha --recursive",
     "start": "node bin/wwww",
-    "quality": "eslint t/**/*.js && eslint public/js/**/*.js && eslint migrations/*.js && eslint bin/*.js"
+    "quality": "eslint t/**/*.js && eslint public/js/**/*.js && eslint lib/**/*.js && eslint migrations/*.js && eslint bin/*.js"
   }
 }

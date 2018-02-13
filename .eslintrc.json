@@ -10,7 +10,11 @@
   
     "env": {
       "es6": true,
-      "node": true
+      "node": true,
+      "amd": true,
+      "browser": true,
+      "jquery": true,
+      "mocha": true
     },
   
     "plugins": [
