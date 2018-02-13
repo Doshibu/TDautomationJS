@@ -1,13 +1,13 @@
 
-'use strict';
+'use strict'
 
 const
   Promise = require('bluebird'),
-  models = require('../lib/model/db');
+  models = require('../lib/model/db')
 
 const
   YEAR_FROM = '2017',
-  YEAR_TO   = '2018';
+  YEAR_TO = '2018'
 
 /*
  *  1. Get all users
@@ -28,14 +28,14 @@ models.User
     user => {
       return user
         .reload_with_leave_details({YEAR_FROM})
-        .then( user => user.promise_number_of_days_available_in_allowance(YEAR_FROM) )
+        .then(user => user.promise_number_of_days_available_in_allowance(YEAR_FROM))
         .then(remainer => {
           return user.promise_to_update_carried_over_allowance({
-            year                   : YEAR_TO,
-            carried_over_allowance : remainer,
-          });
+            year: YEAR_TO,
+            carried_over_allowance: remainer
+          })
         })
-        .then(() => Promise.resolve(console.log('Done with user ' + user.id)));
+        .then(() => Promise.resolve(console.log('Done with user ' + user.id)))
     },
-    {concurrency : 1}
-  ));
+    {concurrency: 1}
+  ))

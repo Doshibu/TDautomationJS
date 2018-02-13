@@ -1,23 +1,23 @@
 
-'use strict';
+'use strict'
 
-var test                 = require('selenium-webdriver/testing'),
-  By                     = require('selenium-webdriver').By,
-  expect                 = require('chai').expect,
-  _                      = require('underscore'),
-  moment                 = require('moment'),
-  Promise                = require("bluebird"),
-  until                  = require('selenium-webdriver').until,
+var test = require('selenium-webdriver/testing'),
+  By = require('selenium-webdriver').By,
+  expect = require('chai').expect,
+  _ = require('underscore'),
+  moment = require('moment'),
+  Promise = require('bluebird'),
+  until = require('selenium-webdriver').until,
   register_new_user_func = require('../../lib/register_new_user'),
-  login_user_func        = require('../../lib/login_with_user'),
-  open_page_func         = require('../../lib/open_page'),
-  submit_form_func       = require('../../lib/submit_form'),
-  add_new_user_func      = require('../../lib/add_new_user'),
-  logout_user_func       = require('../../lib/logout_user'),
-  check_booking_func     = require('../../lib/check_booking_on_calendar'),
-  check_elements_func    = require('../../lib/check_elements'),
-  config                 = require('../../lib/config'),
-  application_host       = config.get_application_host();
+  login_user_func = require('../../lib/login_with_user'),
+  open_page_func = require('../../lib/open_page'),
+  submit_form_func = require('../../lib/submit_form'),
+  add_new_user_func = require('../../lib/add_new_user'),
+  logout_user_func = require('../../lib/logout_user'),
+  check_booking_func = require('../../lib/check_booking_on_calendar'),
+  check_elements_func = require('../../lib/check_elements'),
+  config = require('../../lib/config'),
+  application_host = config.get_application_host()
 
 /*
  *  Scenario to check:
@@ -38,346 +38,343 @@ var test                 = require('selenium-webdriver/testing'),
  *
  * */
 
-describe('Revoke leave request', function(){
+describe('Revoke leave request', function () {
+  this.timeout(config.get_execution_timeout())
 
-  this.timeout( config.get_execution_timeout() );
+  var email_admin, admin_user_id,
+    email_manager_a, manager_a_user_id,
+    email_manager_b, manager_b_user_id,
+    email_employee, employee_user_id,
+    driver
 
-  var email_admin   , admin_user_id,
-      email_manager_a, manager_a_user_id,
-      email_manager_b, manager_b_user_id,
-      email_employee, employee_user_id,
-      driver;
-
-  it('Create new company', function(done){
+  it('Create new company', function (done) {
     register_new_user_func({
-      application_host : application_host,
+      application_host: application_host
     })
-    .then(function(data){
-      driver = data.driver;
-      email_admin = data.email;
-      done();
-    });
-  });
+    .then(function (data) {
+      driver = data.driver
+      email_admin = data.email
+      done()
+    })
+  })
 
-  it("Create MANAGER_A-to-be user", function(done){
+  it('Create MANAGER_A-to-be user', function (done) {
     add_new_user_func({
-      application_host : application_host,
-      driver           : driver,
+      application_host: application_host,
+      driver: driver
     })
-    .then(function(data){
-      email_manager_a = data.new_user_email;
-      done();
-    });
-  });
+    .then(function (data) {
+      email_manager_a = data.new_user_email
+      done()
+    })
+  })
 
-  it("Create MANAGER_A-to-be user", function(done){
+  it('Create MANAGER_A-to-be user', function (done) {
     add_new_user_func({
-      application_host : application_host,
-      driver           : driver,
+      application_host: application_host,
+      driver: driver
     })
-    .then(function(data){
-      email_manager_b = data.new_user_email;
-      done();
-    });
-  });
+    .then(function (data) {
+      email_manager_b = data.new_user_email
+      done()
+    })
+  })
 
-  it("Create EMPLOYEE-to-be user", function(done){
+  it('Create EMPLOYEE-to-be user', function (done) {
     add_new_user_func({
-      application_host : application_host,
-      driver           : driver,
+      application_host: application_host,
+      driver: driver
     })
-    .then(function(data){
-      email_employee = data.new_user_email;
-      done();
-    });
-  });
+    .then(function (data) {
+      email_employee = data.new_user_email
+      done()
+    })
+  })
 
-  it("Open department management page", function(done){
+  it('Open department management page', function (done) {
     open_page_func({
-      url    : application_host + 'settings/departments-bulk-update/',
-      driver : driver,
+      url: application_host + 'settings/departments-bulk-update/',
+      driver: driver
     })
-    .then(function(){ done() });
-  });
+    .then(function () { done() })
+  })
 
-  it('Update department to be supervised by MANAGER_A', function(done){
+  it('Update department to be supervised by MANAGER_A', function (done) {
     submit_form_func({
-      driver      : driver,
-      form_params : [{
-        selector : 'input[name="name__0"]',
+      driver: driver,
+      form_params: [{
+        selector: 'input[name="name__0"]',
         // Just to make sure it is always first in the lists
-        value : 'AAAAA',
-      },{
-        selector        : 'select[name="allowance__0"]',
-        option_selector : 'option[value="15"]',
-        value : '15',
-      },{
-        selector        : 'select[name="boss_id__0"]',
-        option_selector : 'select[name="boss_id__0"] option:nth-child(2)',
+        value: 'AAAAA'
+      }, {
+        selector: 'select[name="allowance__0"]',
+        option_selector: 'option[value="15"]',
+        value: '15'
+      }, {
+        selector: 'select[name="boss_id__0"]',
+        option_selector: 'select[name="boss_id__0"] option:nth-child(2)'
       }],
-      message : /Changes to departments were saved/,
+      message: /Changes to departments were saved/
     })
-    .then(function(){ done() });
-  });
+    .then(function () { done() })
+  })
 
-  it("Logout from admin account", function(done){
+  it('Logout from admin account', function (done) {
     logout_user_func({
-      application_host : application_host,
-      driver           : driver,
+      application_host: application_host,
+      driver: driver
     })
-    .then(function(){ done() });
-  });
+    .then(function () { done() })
+  })
 
-  it("Login as EMPLOYEE user", function(done){
+  it('Login as EMPLOYEE user', function (done) {
     login_user_func({
-      application_host : application_host,
-      user_email       : email_employee,
-      driver           : driver,
+      application_host: application_host,
+      user_email: email_employee,
+      driver: driver
     })
-    .then(function(){ done() });
-  });
+    .then(function () { done() })
+  })
 
-  it("Open calendar page", function(done){
+  it('Open calendar page', function (done) {
     open_page_func({
-      url    : application_host + 'calendar/?show_full_year=1',
-      driver : driver,
+      url: application_host + 'calendar/?show_full_year=1',
+      driver: driver
     })
-    .then(function(){ done() });
-  });
+    .then(function () { done() })
+  })
 
-  it("And make sure that it is calendar indeed", function(done){
+  it('And make sure that it is calendar indeed', function (done) {
     driver
       .getTitle()
-      .then(function(title){
-        expect(title).to.be.equal('Calendar');
-        done();
-      });
-  });
+      .then(function (title) {
+        expect(title).to.be.equal('Calendar')
+        done()
+      })
+  })
 
-  it("Request new leave", function(done){
+  it('Request new leave', function (done) {
     driver
       .findElement(By.css('#book_time_off_btn'))
-      .then(function(el){
-        return el.click();
+      .then(function (el) {
+        return el.click()
       })
-      .then(function(){
-
+      .then(function () {
         // This is very important line when working with Bootstrap modals!
-        driver.sleep(1000);
+        driver.sleep(1000)
 
         submit_form_func({
-          driver      : driver,
+          driver: driver,
           // The order matters here as we need to populate dropdown prior date filds
-          form_params : [{
-            selector        : 'select[name="from_date_part"]',
-            option_selector : 'option[value="2"]',
-            value           : "2",
-          },{
-            selector : 'input#from',
-            value : '2018-05-15',
-          },{
-            selector : 'input#to',
-            value : '2018-05-16',
+          form_params: [{
+            selector: 'select[name="from_date_part"]',
+            option_selector: 'option[value="2"]',
+            value: '2'
+          }, {
+            selector: 'input#from',
+            value: '2018-05-15'
+          }, {
+            selector: 'input#to',
+            value: '2018-05-16'
           }],
-          message : /New leave request was added/,
+          message: /New leave request was added/
         })
-        .then(function(){ done() });
-      });
-  });
+        .then(function () { done() })
+      })
+  })
 
-  it("Check that all days are marked as pended", function(done){
+  it('Check that all days are marked as pended', function (done) {
     check_booking_func({
-      driver         : driver,
-      full_days      : [moment('2018-05-16')],
-      halfs_1st_days : [moment('2018-05-15')],
-      type           : 'pended',
+      driver: driver,
+      full_days: [moment('2018-05-16')],
+      halfs_1st_days: [moment('2018-05-15')],
+      type: 'pended'
     })
-    .then(function(){ done() });
-  });
+    .then(function () { done() })
+  })
 
-  it("Logout from EMPLOYEE account", function(done){
+  it('Logout from EMPLOYEE account', function (done) {
     logout_user_func({
-      application_host : application_host,
-      driver           : driver,
+      application_host: application_host,
+      driver: driver
     })
-    .then(function(){ done() });
-  });
+    .then(function () { done() })
+  })
 
-  it("Login as MANAGER_A user", function(done){
+  it('Login as MANAGER_A user', function (done) {
     login_user_func({
-      application_host : application_host,
-      user_email       : email_manager_a,
-      driver           : driver,
+      application_host: application_host,
+      user_email: email_manager_a,
+      driver: driver
     })
-    .then(function(){ done() });
-  });
+    .then(function () { done() })
+  })
 
-  it("Open requests page", function( done ){
+  it('Open requests page', function (done) {
     open_page_func({
-      url    : application_host + 'requests/',
-      driver : driver,
+      url: application_host + 'requests/',
+      driver: driver
     })
-    .then(function(){ done() });
-  });
+    .then(function () { done() })
+  })
 
-  it('Make sure that newly created request is waiting for approval', function(done){
+  it('Make sure that newly created request is waiting for approval', function (done) {
     check_elements_func({
-      driver : driver,
-      elements_to_check : [{
-        selector : 'tr[vpp="pending_for__'+email_employee+'"] .btn-warning',
-        value    : "Reject",
-      }],
+      driver: driver,
+      elements_to_check: [{
+        selector: 'tr[vpp="pending_for__' + email_employee + '"] .btn-warning',
+        value: 'Reject'
+      }]
     })
-    .then(function(){ done() });
-  });
+    .then(function () { done() })
+  })
 
-  it("Approve newly added leave request", function(done){
+  it('Approve newly added leave request', function (done) {
     driver
       .findElement(By.css(
-        'tr[vpp="pending_for__'+email_employee+'"] .btn-success'
+        'tr[vpp="pending_for__' + email_employee + '"] .btn-success'
       ))
-      .then(function(el){ return el.click(); })
-      .then(function(){
+      .then(function (el) { return el.click() })
+      .then(function () {
         // Wait until page properly is reloaded
-        return driver.wait(until.elementLocated(By.css('h1')), 1000);
+        return driver.wait(until.elementLocated(By.css('h1')), 1000)
       })
-      .then(function(){ done() });
-  });
+      .then(function () { done() })
+  })
 
-  it("Logout from MANAGER_A account", function(done){
+  it('Logout from MANAGER_A account', function (done) {
     logout_user_func({
-      application_host : application_host,
-      driver           : driver,
+      application_host: application_host,
+      driver: driver
     })
-    .then(function(){ done() });
-  });
+    .then(function () { done() })
+  })
 
-  it("Login as ADMIN user", function(done){
+  it('Login as ADMIN user', function (done) {
     login_user_func({
-      application_host : application_host,
-      user_email       : email_admin,
-      driver           : driver,
+      application_host: application_host,
+      user_email: email_admin,
+      driver: driver
     })
-    .then(function(){ done() });
-  });
+    .then(function () { done() })
+  })
 
-  it("Open department management page", function(done){
+  it('Open department management page', function (done) {
     open_page_func({
-      url    : application_host + 'settings/departments-bulk-update/',
-      driver : driver,
+      url: application_host + 'settings/departments-bulk-update/',
+      driver: driver
     })
-    .then(function(){ done() });
-  });
+    .then(function () { done() })
+  })
 
-  it('Update department to be supervised by MANAGER_B', function(done){
+  it('Update department to be supervised by MANAGER_B', function (done) {
     submit_form_func({
-      driver      : driver,
-      form_params : [{
-        selector : 'input[name="name__0"]',
+      driver: driver,
+      form_params: [{
+        selector: 'input[name="name__0"]',
         // Just to make sure it is always first in the lists
-        value : 'AAAAA',
-      },{
-        selector        : 'select[name="allowance__0"]',
-        option_selector : 'option[value="15"]',
-        value : '15',
-      },{
-        selector        : 'select[name="boss_id__0"]',
-        option_selector : 'select[name="boss_id__0"] option:nth-child(3)',
+        value: 'AAAAA'
+      }, {
+        selector: 'select[name="allowance__0"]',
+        option_selector: 'option[value="15"]',
+        value: '15'
+      }, {
+        selector: 'select[name="boss_id__0"]',
+        option_selector: 'select[name="boss_id__0"] option:nth-child(3)'
       }],
-      message : /Changes to departments were saved/,
+      message: /Changes to departments were saved/
     })
-    .then(function(){ done() });
-  });
+    .then(function () { done() })
+  })
 
-  it("Logout from admin account", function(done){
+  it('Logout from admin account', function (done) {
     logout_user_func({
-      application_host : application_host,
-      driver           : driver,
+      application_host: application_host,
+      driver: driver
     })
-    .then(function(){ done() });
-  });
+    .then(function () { done() })
+  })
 
-  it("Login as EMPLOYEE user", function(done){
+  it('Login as EMPLOYEE user', function (done) {
     login_user_func({
-      application_host : application_host,
-      user_email       : email_employee,
-      driver           : driver,
+      application_host: application_host,
+      user_email: email_employee,
+      driver: driver
     })
-    .then(function(){ done() });
-  });
+    .then(function () { done() })
+  })
 
-  it("Open requests page", function(done){
+  it('Open requests page', function (done) {
     open_page_func({
-      url    : application_host + 'requests/',
-      driver : driver,
+      url: application_host + 'requests/',
+      driver: driver
     })
-    .then(function(){ done() });
-  });
+    .then(function () { done() })
+  })
 
-  it('Revoke request', function(done){
+  it('Revoke request', function (done) {
     driver
       .findElement(By.css(
         'button.revoke-btn'
       ))
-      .then(function(el){ return el.click(); })
-      .then(function(){
+      .then(function (el) { return el.click() })
+      .then(function () {
         // Wait until page properly is reloaded
-        return driver.wait(until.elementLocated(By.css('h1')), 1000);
+        return driver.wait(until.elementLocated(By.css('h1')), 1000)
       })
-      .then(function(){ done() });
-  });
+      .then(function () { done() })
+  })
 
-  it("Logout from EMPLOYEE account", function(done){
+  it('Logout from EMPLOYEE account', function (done) {
     logout_user_func({
-      application_host : application_host,
-      driver           : driver,
+      application_host: application_host,
+      driver: driver
     })
-    .then(function(){ done() });
-  });
+    .then(function () { done() })
+  })
 
-  it("Login as MANAGER_B user", function(done){
+  it('Login as MANAGER_B user', function (done) {
     login_user_func({
-      application_host : application_host,
-      user_email       : email_manager_b,
-      driver           : driver,
+      application_host: application_host,
+      user_email: email_manager_b,
+      driver: driver
     })
-    .then(function(){ done() });
-  });
+    .then(function () { done() })
+  })
 
-  it("Open requests page", function(done){
+  it('Open requests page', function (done) {
     open_page_func({
-      url    : application_host + 'requests/',
-      driver : driver,
+      url: application_host + 'requests/',
+      driver: driver
     })
-    .then(function(){ done() });
-  });
+    .then(function () { done() })
+  })
 
-  it("Make sure newly revoked request is shown for approval", function(done){
+  it('Make sure newly revoked request is shown for approval', function (done) {
     check_elements_func({
-      driver : driver,
-      elements_to_check : [{
-        selector : 'tr[vpp="pending_for__'+email_employee+'"] .btn-warning',
-        value    : "Reject",
-      }],
+      driver: driver,
+      elements_to_check: [{
+        selector: 'tr[vpp="pending_for__' + email_employee + '"] .btn-warning',
+        value: 'Reject'
+      }]
     })
-    .then(function(){ done() });
-  });
+    .then(function () { done() })
+  })
 
-  it("Approve revoke request", function(done){
+  it('Approve revoke request', function (done) {
     driver
       .findElement(By.css(
-        'tr[vpp="pending_for__'+email_employee+'"] .btn-success'
+        'tr[vpp="pending_for__' + email_employee + '"] .btn-success'
       ))
-      .then(function(el){ return el.click(); })
-      .then(function(){
+      .then(function (el) { return el.click() })
+      .then(function () {
         // Wait until page properly is reloaded
-        return driver.wait(until.elementLocated(By.css('h1')), 1000);
+        return driver.wait(until.elementLocated(By.css('h1')), 1000)
       })
-      .then(function(){ done() });
-  });
+      .then(function () { done() })
+  })
 
-  after(function(done){
-    driver.quit().then(function(){ done(); });
-  });
-
-});
+  after(function (done) {
+    driver.quit().then(function () { done() })
+  })
+})
