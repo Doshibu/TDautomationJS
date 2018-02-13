@@ -49,8 +49,8 @@
   },
   "scripts": {
     "pretest": "npm run quality",
-    "test": "mocha --recursive",
+    "test": "node node_modules/mocha/bin/mocha --recursive",
     "start": "node bin/wwww",
-    "quality": "eslint t/**/*.js && eslint public/js/**/*.js && eslint lib/**/*.js && eslint migrations/*.js && eslint bin/*.js"
+    "quality": "node  node_modules/eslint/bin/eslint **/*.js"
   }
 }
