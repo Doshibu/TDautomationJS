@@ -48,7 +48,7 @@
     "mocha": "^5.0.0"
   },
   "scripts": {
-    "pretest": "npm i && npm run quality",
+    "pretest": "npm i && npm run quality --verbose",
     "test": "node node_modules/mocha/bin/mocha --recursive",
     "start": "node bin/wwww",
     "quality": "node  node_modules/eslint/bin/eslint **/*.js"
